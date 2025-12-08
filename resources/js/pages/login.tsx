@@ -34,6 +34,7 @@ export default function Login() {
                 // Redirect to protected page
                 router.visit('/chat-interface');
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.log(error.response?.data);
             alert('Login failed! Check your email or password.');

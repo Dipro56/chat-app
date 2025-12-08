@@ -4,6 +4,9 @@ import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot } from "react-dom/client";
 import { AuthProvider } from "@/context/AuthContext";   // <-- add this
+import { SidebarProvider } from "./context/SidebarContext";
+import { SelectedUserProvider } from "./context/SelectedUserContext";
+
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -19,7 +22,12 @@ createInertiaApp({
 
         root.render(
             <AuthProvider>          {/* <-- Wrap here */}
-                <App {...props} />
+                <SelectedUserProvider>
+                    <SidebarProvider>
+                        <App {...props} />
+                    </SidebarProvider>
+                </SelectedUserProvider>
+
             </AuthProvider>
         );
     },
