@@ -8,6 +8,10 @@ use App\Actions\SendMessageAction;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\Message;
+use App\Events\UserTyping;
+
+
+
 
 class MessageController extends Controller
 {
@@ -61,5 +65,18 @@ class MessageController extends Controller
             ->get();
 
         return response()->json(['status' => 'success', 'data' => $messages]);
+    }
+
+    public function typing(Request $request)
+    {
+        $request->validate([
+            'receiver_id' => 'required|integer',
+        ]);
+
+        broadcast(new UserTyping($request->receiver_id, 2))->toOthers();
+
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 }

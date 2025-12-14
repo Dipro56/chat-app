@@ -21,7 +21,7 @@ interface ChatSidebarProps {
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({ onLogout }) => {
     const { closeSidebar } = useSidebar();
-    const { user: currentUser } = useAuth();
+    const { user } = useAuth();
     const { selectedUser, setSelectedUser } = useSelectedUser();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
@@ -98,6 +98,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onLogout }) => {
         }
     };
 
+    useEffect(() => {
+        console.log('user',user)
+    },[user])
+
     return (
         <div className="fixed inset-y-0 left-0 z-50 w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-r border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 ease-in-out shadow-xl
             md:translate-x-0 md:static md:flex md:flex-col">
@@ -106,10 +110,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onLogout }) => {
             <div className="p-6 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                        {getUserInitial(currentUser?.name || 'User')}
+                        {getUserInitial(user?.name || 'User')}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h2 className="text-lg font-semibold truncate">{currentUser?.name}</h2>
+                        <h2 className="text-lg font-semibold truncate">{user?.name}</h2>
                         <span className="text-xs text-green-500 font-medium flex items-center gap-1">
                             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                             Online

@@ -16,6 +16,7 @@ class Message extends Model
     protected $fillable = [
         'conversation_id',
         'sender_id',
+        'receiver_id',
         'body',
         'created_at'
     ];
@@ -24,8 +25,21 @@ class Message extends Model
         'created_at' => 'datetime'
     ];
 
+    // Sender relationship
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    // Receiver relationship
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    // Conversation relationship
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class, 'conversation_id');
     }
 }

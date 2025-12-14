@@ -1,12 +1,18 @@
+import { useAuth } from '@/context/AuthContext';
+import api from '@/lib/axios';
 import { Head, Link, router } from '@inertiajs/react';
 import { LogIn } from 'lucide-react';
 import { useState } from 'react';
-import api from '@/lib/axios';
-import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
-  const [form, setForm] = useState({ email: '', password: '' });
+    const [form, setForm] = useState({ email: '', password: '' });
     const { login } = useAuth(); // from AuthContext
+
+    const getCsrf = async () => {
+        await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+            credentials: 'include', // important!
+        });
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,26 +21,19 @@ export default function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        await getCsrf();
+
         try {
-            const response = await api.post('/login', {
+            await api.post('/login', {
                 email: form.email,
                 password: form.password,
             });
 
-            if (response.data.status === 'success') {
-                const userData = response.data.data;
+            const me = await api.get('/me');
+            console.log('meme', me, me.data);
+            login(me.data);
 
-                // Save token + user
-                localStorage.setItem('token', userData.token);
-                localStorage.setItem('user', JSON.stringify(userData));
-
-                // Update context
-                login(userData);
-
-                // Redirect to protected page
-                router.visit('/chat-interface');
-            }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            router.visit('/chat-interface');
         } catch (error: any) {
             console.log(error.response?.data);
             alert('Login failed! Check your email or password.');

@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import api from '@/lib/axios';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext<any>(null);
@@ -7,15 +7,14 @@ export const AuthProvider = ({ children }: any) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
+        api.get('/me')
+            .then((res) => setUser(res.data))
+            .catch(() => setUser(null));
     }, []);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const login = (userData: any) => {
-        const userDetails = userData?.user;
+        const userDetails = userData;
         setUser(userDetails);
         localStorage.setItem('user', JSON.stringify(userDetails));
     };
@@ -23,7 +22,8 @@ export const AuthProvider = ({ children }: any) => {
     const logout = () => {
         setUser(null);
         localStorage.removeItem('user');
-        router.visit('/login');
+        // router.visit('/login');
+        window.location.href = '/login';
     };
 
     return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;

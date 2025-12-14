@@ -6,6 +6,27 @@ import { createRoot } from "react-dom/client";
 import { AuthProvider } from "@/context/AuthContext";   // <-- add this
 import { SidebarProvider } from "./context/SidebarContext";
 import { SelectedUserProvider } from "./context/SelectedUserContext";
+import { configureEcho } from '@laravel/echo-react';
+import './echo';
+
+// configureEcho({
+//     broadcaster: 'reverb',
+// });
+
+try {
+    configureEcho({
+        broadcaster: 'reverb',
+        key: import.meta.env.VITE_REVERB_APP_KEY || 'reverb-local-key',
+        wsHost: import.meta.env.VITE_REVERB_HOST || '127.0.0.1',
+        wsPort: import.meta.env.VITE_REVERB_PORT || 6001,
+        wssPort: import.meta.env.VITE_REVERB_PORT || 6001,
+        forceTLS: false,
+        enabledTransports: ['ws', 'wss'],
+    });
+    console.log('✅ Echo configured successfully');
+} catch (error) {
+    console.error('❌ Echo configuration failed:', error);
+}
 
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";

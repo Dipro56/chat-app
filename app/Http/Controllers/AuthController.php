@@ -34,30 +34,51 @@ class AuthController extends Controller
     }
 
     // -------- LOGIN --------
+    // public function login(Request $request)
+    // {
+    //     $credentials = $request->validate([
+    //         'email'    => 'required|email',
+    //         'password' => 'required',
+    //     ]);
+
+    //     if (!Auth::attempt($credentials)) {
+    //         return ApiResponse::error('Invalid credentials', 401);
+    //     }
+
+    //     $user  = Auth::user();
+    //     $token = $user->createToken('auth_token')->plainTextToken;
+
+
+
+    //     return ApiResponse::success(
+    //         'Login successful',
+    //         [
+    //             'token' => $token,
+    //             'user'  => $user
+    //         ]
+    //     );
+    // }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6',
         ]);
 
         if (!Auth::attempt($credentials)) {
             return ApiResponse::error('Invalid credentials', 401);
         }
 
-        $user  = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-
+        // Create Laravel session
+        $request->session()->regenerate();
 
         return ApiResponse::success(
             'Login successful',
-            [
-                'token' => $token,
-                'user'  => $user
-            ]
+            ['user' => Auth::user()]
         );
     }
+
 
     // -------- LOGOUT --------
     public function logout(Request $request)
