@@ -34,8 +34,8 @@ export default function Login() {
             login(me.data);
 
             router.visit('/chat-interface');
-        } catch (error: any) {
-            console.log(error.response?.data);
+        } catch (error: unknown) {
+            console.log(error);
             alert('Login failed! Check your email or password.');
         }
     };

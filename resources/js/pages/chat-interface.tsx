@@ -17,6 +17,10 @@ interface Message {
     created_at: string;
 }
 
+interface SocketMessageEvent {
+    message: Message;
+}
+
 export default function ChatInterface() {
     const { user, logout } = useAuth();
     const { sidebarOpen, toggleSidebar, closeSidebar } = useSidebar();
@@ -24,9 +28,7 @@ export default function ChatInterface() {
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
-    const [typingUsers, setTypingUsers] = useState<number[]>([]);
     const [sending, setSending] = useState(false);
-    const [isMessageSent, setIsMessageSent] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -59,8 +61,6 @@ export default function ChatInterface() {
             if (res.data.status === 'success') {
                 setNewMessage('');
                 setMessages((prev) => [...prev, res.data.data]);
-                // fetchConversation();
-                setIsMessageSent(true);
             }
         } catch (err) {
             console.error(err);
@@ -82,27 +82,30 @@ export default function ChatInterface() {
         audio.play();
     };
 
-    // Real-time setup
-
     useEffect(() => {
+        if (!user?.id) return;
 
+        const channel = window.Echo.private(`chat.${user.id}`)
+            .subscribed(() => {
+                console.log('✅ Subscribed to chat.' + user.id);
+            })
+            .error((error: unknown) => {
+                console.error('❌ Subscription error:', error);
+            });
 
-        const channel = window.Echo.private(`chat.${user?.id}`);
-
-        console.log('channel', channel);
-
-        channel.listen('.MessageSent', (e: any) => {
-            if (e?.message?.receiver_id == user?.id) {
+        channel.listenToAll((event: string, data: SocketMessageEvent) => {
+            console.log('🔥 EVENT:', event, data);
+            if (data?.message?.receiver_id == user?.id) {
                 playSound();
-                setMessages((prev) => [...prev, e.message]);
-                console.log('✅ SOCKET MESSAGE:', e.message);
+                setMessages((prev) => [...prev, data.message]);
+                console.log('✅ SOCKET MESSAGE:', data.message);
             }
         });
 
         return () => {
-            window.Echo.leave(`chat.${user?.id}`);
+            window.Echo.leave(`chat.${user.id}`);
         };
-    }, [isMessageSent, user]);
+    }, [user?.id]);
 
     useEffect(() => {
         fetchConversation();
@@ -115,10 +118,11 @@ export default function ChatInterface() {
     return (
         <ProtectedRoute>
             <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
-                <ChatSidebar onLogout={logout} />
+                {sidebarOpen ? <ChatSidebar onLogout={logout} /> : null}
+
                 {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={closeSidebar} />}
                 <div className="flex flex-1 flex-col md:ml-0">
-                    {selectedUser ? (
+                    {selectedUser && user ? (
                         <>
                             {/* Top Bar */}
                             <div className="flex h-20 items-center justify-between border-b border-gray-200/50 bg-white/80 px-6 shadow-sm backdrop-blur-lg dark:border-gray-700/50 dark:bg-gray-800/80">
@@ -140,15 +144,8 @@ export default function ChatInterface() {
                                         </div>
                                         <div>
                                             <h1 className="text-lg font-bold text-gray-900 dark:text-white">{selectedUser?.name}</h1>
-                                            <span
-                                                className={`text-sm ${typingUsers?.includes(selectedUser.id) ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}
-                                            >
-                                                {typingUsers.includes(selectedUser.id)
-                                                    ? 'Typing...'
-                                                    : selectedUser.status === 'Online'
-                                                      ? 'Online'
-                                                      : 'Offline'}
-                                            </span>
+                                          {selectedUser.status === 'Online' ? 'Online' : 'Offline'}
+
                                         </div>
                                     </div>
                                 </div>
