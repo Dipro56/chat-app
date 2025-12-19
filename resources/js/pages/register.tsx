@@ -1,9 +1,11 @@
+// import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Register() {
     const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
+    // const { login } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,12 +21,13 @@ export default function Register() {
                 password: form.password,
             });
 
-            if (response.data.data.token) {
-                localStorage.setItem('token', response.data.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.data));
+            console.log('response', response);
+
+            if (response.data.data) {
+                router.visit('/login');
             }
 
-            router.visit('/chat-interface');
+            // router.visit('/chat-interface');
         } catch (error: unknown) {
             console.log(error);
             alert('Registration failed!');

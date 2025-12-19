@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface SidebarContextType {
     sidebarOpen: boolean;
@@ -15,12 +15,15 @@ interface SidebarProviderProps {
 }
 
 export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         const checkIsMobile = () => {
             setIsMobile(window.innerWidth < 768);
+            if (window.innerWidth >= 768) {
+                setSidebarOpen(true)
+            }
         };
 
         // Initial check
@@ -36,7 +39,7 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
     }, []);
 
     const toggleSidebar = () => {
-        setSidebarOpen(prev => !prev);
+        setSidebarOpen((prev) => !prev);
     };
 
     const openSidebar = () => {
@@ -48,13 +51,15 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
     };
 
     return (
-        <SidebarContext.Provider value={{
-            sidebarOpen,
-            toggleSidebar,
-            openSidebar,
-            closeSidebar,
-            isMobile
-        }}>
+        <SidebarContext.Provider
+            value={{
+                sidebarOpen,
+                toggleSidebar,
+                openSidebar,
+                closeSidebar,
+                isMobile,
+            }}
+        >
             {children}
         </SidebarContext.Provider>
     );

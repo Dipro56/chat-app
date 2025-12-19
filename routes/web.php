@@ -54,24 +54,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
     Route::get('/get-userlist', [UserController::class, 'index']);
+
     Route::post('/messages/typing', [MessageController::class, 'typing']);
-
-
-    // Route::post('/messages/send', [MessageController::class, 'send']);
-    // Route::get('/messages/conversations', [MessageController::class, 'getConversations']);
-    // Route::get('/messages/conversation/{userId}', [MessageController::class, 'getConversation']);
-    // Route::delete('/messages/{id}', [MessageController::class, 'delete']);
-    // Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount']);
-
-    // Send a message or create conversation
     Route::post('/messages/send', [MessageController::class, 'sendMessage']);
-
-    // Get all messages between current user and selected user
     Route::get('/messages/conversation/{userId}', [MessageController::class, 'getConversation']);
 });
-
-// Route::middleware(['api.token.auth'])->group(function () {
-//     Route::get('/chat-interface', function () {
-//         return Inertia::render('chat-interface');
-//     })->name('chat-interface');
-// });

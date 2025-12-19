@@ -26,6 +26,9 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        // Create Laravel session
+        $request->session()->regenerate();
+
         return ApiResponse::success(
             'User registered successfully',
             $user,
@@ -83,7 +86,11 @@ class AuthController extends Controller
     // -------- LOGOUT --------
     public function logout(Request $request)
     {
+        Auth::logout();
+
         $request->user()->tokens()->delete();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return ApiResponse::success('Logged out successfully');
     }

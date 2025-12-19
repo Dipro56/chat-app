@@ -5,7 +5,7 @@ import { useSelectedUser } from '@/context/SelectedUserContext';
 import { useSidebar } from '@/context/SidebarContext';
 import { getMessageTime } from '@/helper/CommonFunction';
 import api from '@/lib/axios';
-import { CheckCheck, Menu, MoreVertical, Send } from 'lucide-react';
+import { CheckCheck, Menu, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface Message {
@@ -104,6 +104,7 @@ export default function ChatInterface() {
 
         return () => {
             window.Echo.leave(`chat.${user.id}`);
+            window.Echo.leave(`private-chat.${user.id}`);
         };
     }, [user?.id]);
 
@@ -118,7 +119,9 @@ export default function ChatInterface() {
     return (
         <ProtectedRoute>
             <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
-                {sidebarOpen ? <ChatSidebar onLogout={logout} /> : null}
+                {sidebarOpen   ? <ChatSidebar onLogout={logout} /> : null}
+
+                {/* <ChatSidebar onLogout={logout} /> */}
 
                 {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={closeSidebar} />}
                 <div className="flex flex-1 flex-col md:ml-0">
@@ -144,16 +147,11 @@ export default function ChatInterface() {
                                         </div>
                                         <div>
                                             <h1 className="text-lg font-bold text-gray-900 dark:text-white">{selectedUser?.name}</h1>
-                                          {selectedUser.status === 'Online' ? 'Online' : 'Offline'}
-
+                                            {selectedUser.status === 'Online' ? 'Online' : 'Offline'}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <button className="rounded-xl p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700/50">
-                                        <MoreVertical size={20} />
-                                    </button>
-                                </div>
+
                             </div>
 
                             {/* Messages */}

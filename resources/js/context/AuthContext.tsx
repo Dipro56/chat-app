@@ -19,11 +19,18 @@ export const AuthProvider = ({ children }: any) => {
         localStorage.setItem('user', JSON.stringify(userDetails));
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('user');
-        // router.visit('/login');
-        window.location.href = '/login';
+    const logout = async () => {
+        try {
+            await api.post('/logout'); // destroy Laravel session
+        } catch (err) {
+            console.error('Logout failed', err);
+        } finally {
+            setUser(null);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+
+            window.location.href = '/login';
+        }
     };
 
     return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
